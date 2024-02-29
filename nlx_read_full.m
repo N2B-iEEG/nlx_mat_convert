@@ -1,4 +1,6 @@
-function output = nlx_read_all(FileName)
+% Read all data and header from a Neuralynx file (.nev or .ncs)
+
+function output = nlx_read_full(FileName)
 
 if ~ispc && ~isunix
     error('Nlx2Mat is only available on Windows/Linux/MacOS\n')
