@@ -1,26 +1,12 @@
-% Segment and save Nerualynx data (.nev and .ncs) based on segment start
-% and end timestamp (Unix time)
+% Segment and save Nerualynx data (.nev and .ncs) based on a run table
+% `run_table`
 
-function nlx_seg(nlx_dir, seg_dir, seg_start_ts, seg_end_ts)
+function nlx_seg(nlx_dir, run_table, ch_excl)
 
 % Works only on Windows/Unix
 if ~ispc && ~isunix
     error('Nlx2Mat is only available on Windows/Linux/MacOS\n')
 end
-
-% Create seg_dir if not already
-if ~exist(seg_dir, 'dir')
-    mkdir(seg_dir)
-end
-
-seg_nev = fullfile(seg_dir, 'Events.nev');
-if exist(seg_nev, 'file')
-    delete(seg_nev)
-end
-
-fprintf(['Segmenting Neuralynx data to%s\n' ...
-    '========================================\n'], ...
-    seg_dir)
 
 %% Find all events and segment
 nev_files = dir(fullfile(nlx_dir, '*.nev'));
@@ -48,32 +34,53 @@ else
     Header{8} = sprintf('-TimeClosed %s', ...
         string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
     EventTable = sortrows(EventTable, 'TimeStamps', 'ascend');
-    within_seg = (EventTable.TimeStamps >= seg_start_ts) & ...
-        (EventTable.TimeStamps <= seg_end_ts);
-    EventTable = EventTable(within_seg,:);
 
-    % Write segmented events to seg_dir
-    if isunix
-        % Unix version requires additional input argument `NumRecs`
-        Mat2NlxEV(char(seg_nev), 0, 1, [], length(EventTable.TimeStamps), ...
-            [1 1 1 1 1 1], ...
-            EventTable.TimeStamps', ...
-            EventTable.EventIDs', ...
-            EventTable.TTLs', ...
-            EventTable.Extras', ...
-            EventTable.EventStrings, ...
-            Header);
-    elseif ispc
-        Mat2NlxEV(char(seg_nev), 0, 1, [], ...
-            [1 1 1 1 1 1], ...
-            EventTable.TimeStamps', ...
-            EventTable.EventIDs', ...
-            EventTable.TTLs', ...
-            EventTable.Extras', ...
-            EventTable.EventStrings, ...
-            Header);
+    % Segment events run by run
+    for i_run = 1:size(run_table, 1)
+
+        run_name = run_table.run_name(i_run);
+        seg_dir = fullfile(nlx_dir, run_name);
+
+        seg_start_ts = run_table.start_ts(i_run);
+        seg_end_ts   = run_table.end_ts(i_run);
+
+        % Create seg_dir if not already
+        if ~exist(seg_dir, 'dir')
+            mkdir(seg_dir)
+        end
+
+        seg_nev = fullfile(seg_dir, 'Events.nev');
+        if exist(seg_nev, 'file')
+            delete(seg_nev)
+        end
+
+        within_seg = (EventTable.TimeStamps >= seg_start_ts) & ...
+            (EventTable.TimeStamps <= seg_end_ts);
+        EventTableSeg = EventTable(within_seg,:);
+
+        % Write segmented events to seg_dir
+        if isunix
+            % Unix version requires additional input argument `NumRecs`
+            Mat2NlxEV(char(seg_nev), 0, 1, [], length(EventTableSeg.TimeStamps), ...
+                [1 1 1 1 1 1], ...
+                EventTableSeg.TimeStamps', ...
+                EventTableSeg.EventIDs', ...
+                EventTableSeg.TTLs', ...
+                EventTableSeg.Extras', ...
+                EventTableSeg.EventStrings, ...
+                Header);
+        elseif ispc
+            Mat2NlxEV(char(seg_nev), 0, 1, [], ...
+                [1 1 1 1 1 1], ...
+                EventTableSeg.TimeStamps', ...
+                EventTableSeg.EventIDs', ...
+                EventTableSeg.TTLs', ...
+                EventTableSeg.Extras', ...
+                EventTableSeg.EventStrings, ...
+                Header);
+        end
+        fprintf('Segmented .nev exported to %s\n', seg_nev)
     end
-    fprintf('Segmented .nev exported to %s\n', seg_nev)
 end
 
 %% Find and segment all recordings
@@ -108,14 +115,13 @@ else
     end
 
     ch_name_all = unique(ncs_table.Var2);
+    ch_name_all = ch_name_all(~ismember(ch_name_all, ch_excl));
 
     % Second loop to gather data from all .ncs with the same channel name
-    % and segment
+    % and segment run by run
+
     for ch = ch_name_all'
-        seg_ch_ncs = fullfile(seg_dir, strcat(ch, '.ncs'));
-        if exist(seg_ch_ncs, 'file')
-            delete(seg_ch_ncs)
-        end
+
         SampTable = table();
         ch_files = table2cell(ncs_table(strcmp(ncs_table.Var2,ch), 1));
         for ch_file = ch_files'
@@ -129,39 +135,65 @@ else
             string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
         Header{9} = sprintf('-TimeClosed %s', ...
             string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
+
         SampTable = sortrows(SampTable, 'TimeStamps', 'ascend');
-        within_seg = (SampTable.TimeStamps >= seg_start_ts) & ...
-            (SampTable.TimeStamps <= seg_end_ts + ...
-            512 / ch_data_this.HeaderStruct.SamplingFrequency * 1e6);
-        SampTable = SampTable(within_seg,:);
 
-        ts_diff = diff(SampTable.TimeStamps);
-        if max(ts_diff) > 5 * 512 / ch_data_this.HeaderStruct.SamplingFrequency * 1e6
-            warning('May not be a contineous recording')
-        end
+        for i_run = 1:size(run_table, 1)
 
-        % Write segmented channel data
-        if isunix
-            % Unix version requires additional input argument `NumRecs`
-            Mat2NlxCSC(char(seg_ch_ncs), 0, 1, [], length(SampTable.TimeStamps), ...
-                [1 1 1 1 1 1], ...
-                SampTable.TimeStamps', ...
-                SampTable.ChannelNumbers', ...
-                SampTable.SampleFrequencies', ...
-                SampTable.NumberOfValidSamples', ...
-                SampTable.Samples', ...
-                Header);
-        elseif ispc
-            Mat2NlxCSC(char(seg_ch_ncs), 0, 1, [], ...
-                [1 1 1 1 1 1], ...
-                SampTable.TimeStamps', ...
-                SampTable.ChannelNumbers', ...
-                SampTable.SampleFrequencies', ...
-                SampTable.NumberOfValidSamples', ...
-                SampTable.Samples', ...
-                Header);
+            run_name = run_table.run_name(i_run);
+            seg_dir = fullfile(nlx_dir, run_name);
+
+            seg_start_ts = run_table.start_ts(i_run);
+            seg_end_ts   = run_table.end_ts(i_run);
+
+            seg_ch_ncs = fullfile(seg_dir, strcat(ch, '.ncs'));
+            if exist(seg_ch_ncs, 'file')
+                delete(seg_ch_ncs)
+            end
+
+            % Time difference between each contineous data sample (in microsec)
+            samp_ts = 512 / ch_data_this.HeaderStruct.SamplingFrequency * 1e6;
+
+            within_seg = (SampTable.TimeStamps >= seg_start_ts - 3 * samp_ts) & ...
+                (SampTable.TimeStamps <= seg_end_ts + 4 * samp_ts);
+            SampTableSeg = SampTable(within_seg,:);
+
+            if SampTableSeg.TimeStamps(1) - seg_start_ts > 0
+                warning('Recording starts after run start TTL')
+            end
+
+            if SampTableSeg.TimeStamps(end) - seg_end_ts < samp_ts
+                warning('Recording ends before run end TTL')
+            end
+
+            ts_diff = diff(SampTableSeg.TimeStamps);
+            if max(ts_diff) > 5 * 512 / ch_data_this.HeaderStruct.SamplingFrequency * 1e6
+                warning('May not be a contineous recording')
+            end
+
+            % Write segmented channel data
+            if isunix
+                % Unix version requires additional input argument `NumRecs`
+                Mat2NlxCSC(char(seg_ch_ncs), 0, 1, [], length(SampTableSeg.TimeStamps), ...
+                    [1 1 1 1 1 1], ...
+                    SampTableSeg.TimeStamps', ...
+                    SampTableSeg.ChannelNumbers', ...
+                    SampTableSeg.SampleFrequencies', ...
+                    SampTableSeg.NumberOfValidSamples', ...
+                    SampTableSeg.Samples', ...
+                    Header);
+            elseif ispc
+                Mat2NlxCSC(char(seg_ch_ncs), 0, 1, [], ...
+                    [1 1 1 1 1 1], ...
+                    SampTableSeg.TimeStamps', ...
+                    SampTableSeg.ChannelNumbers', ...
+                    SampTableSeg.SampleFrequencies', ...
+                    SampTableSeg.NumberOfValidSamples', ...
+                    SampTableSeg.Samples', ...
+                    Header);
+            end
+            fprintf('Segmented .ncs exported to %s\n', seg_ch_ncs)
         end
-        fprintf('Segmented .ncs exported to %s\n', seg_ch_ncs)
     end
 end
 
