@@ -1,8 +1,8 @@
-% MAT2NLXCSC   Exports data from MATLAB into a Neuralynx NCS file.
+% MAT2NLXNSD   Exports data from MATLAB into a Neuralynx NSD file.
 %
-%   Mat2NlxCSC(FileName, AppendToFileFlag, ExportMode, ExportModeVector,
-%              FieldSelectionFlags, Timestamps, ChannelNumbers,
-%              SampleFrequencies, NumberOfValidSamples, Samples, Header);
+%   Mat2NlxNSD(  Filename, AppendToFileFlag, ExportMode, ExportModeVector,
+%               FieldSelectionFlags, TimeStamps, SequenceIDs, ControlFlags, ChannelVoltageData, ChannelCurrentData, 
+%               ReferenceVoltageData, ReferenceCurrentData, Header);
 %
 %   Version 6.1.0
 %
@@ -23,13 +23,13 @@
 %   4. Export data will always be assigned in the order indicated in the
 %      FieldSelectionFlags. If data is not imported via a FieldSelectionFlags
 %      index being 0, simply omit the export variable from the command.
-%      EXAMPLE: FieldSelectionFlags = [1 0 0 0 1 0];
-%      Mat2NlxCSC('test.ncs',0,1,1, FieldSelectionFlags,Timestamps, Samples);
+%      EXAMPLE: FieldSelectionFlags = [1 0 0 0 0 1];
+%      [Timestamps,ReferenceCurrentData] = Nlx2MatNSD('test.nsd',FieldSelectionFlags,0,6,[]);
 %
 %
 %   INPUTS:
 %   FileName: String containing either the complete ('C:\CheetahData\
-%             CSC1.ncs') or relative ('CSC1.ncs') path of the file where you
+%             StimulationData.nsd') or relative ('StimulationData.nsd') path of the file where you
 %             wish to export data. 
 %   AppendToFileFlag: If this flag is a zero and the file does not exist, a new
 %                     file will be created. If the file already exists, and the
@@ -114,27 +114,32 @@
 %                        export variables will be necessary. The order of
 %                        the items in the vector correspond to the following:
 %                           FieldSelectionFlags(1): Timestamps
-%                           FieldSelectionFlags(2): Channel Numbers
-%                           FieldSelectionFlags(3): Sample Frequency
-%                           FieldSelectionFlags(4): Number of Valid Samples
-%                           FieldSelectionFlags(5): Samples
-%                           FieldSelectionFlags(6): Header
-%                        EXAMPLE: [1 0 0 0 1 0] exports timestamp and sample
-%                        vectors and excludes all other data.
-%   Timestamps: A 1xN integer vector of timestamps. This must be in ascending order.
-%   ChannelNumbers: A 1xN integer vector of channel numbers.
-%   SampleFrequencies: A 1xN integer vector of sample frequencies.
-%   NumberOfValidSamples: A 1xN integer vector of the number of valid samples in the
-%                         corresponding item in the Sample output variable.
-%   Samples: A 512xN integer matrix of the data points. These values are in AD counts.
-%   Header: A Mx1 string vector of all the text from the Neuralynx file header, where
+%                           FieldSelectionFlags(2): SequenceIDs
+%                           FieldSelectionFlags(3): ControlFlags
+%                           FieldSelectionFlags(4): ChannelVoltageData
+%                           FieldSelectionFlags(5): ChannelCurrentData
+%                           FieldSelectionFlags(6): ReferenceVoltageData
+%                           FieldSelectionFlags(7): ReferenceCurrentData
+%                        EXAMPLE: [1 1 0 0 0 1 0] exports timestamps sequence ID and reference voltage data
+%                        from each record and excludes all other data.
+%   Timestamps: A 1xN integer vector of timestamps.
+%   SequenceIDs: A 1xN integer vector of the sequence ID of the record.
+%   Control flags: A 1xN integer vector of control flags associated with each record.
+%   Channel Voltage Data: A 64xN integer vector of the delivered voltage
+%                    values for each record. This value is in microvolts.
+%   Reference Voltage Data: An 8xN integer matrix of the delivered voltage values for the references for each frame. These values
+%            are in microvolts.
+%   ChannelCurrentData: A 64xN integer matrix of the delivered current values for each record.
+%           These values are in microamps.
+%   ReferenceCurrentData: An 8xN integer matrix of the delivered current values for each reference for each record.
+%           These values are in microamps.
+%      Header: A Mx1 string vector of all the text from the Neuralynx file header, where
 %           M is the number of lines of text in the header.
 %
-%   EXAMPLE: Mat2NlxCSC('test.ncs', 0, 1, 1, [1 1 1 1 1 1], Timestamps,
-%                      ChannelNumbers, SampleFrequencies, NumberOfValidSamples,
-%                      Samples, Header);
+%   EXAMPLE: Mat2NlxNSD('test.nsd', 0, 1, [], [1 1 1 1 1 1 1],
+%                      Timestamps, SequenceIDs, ControlFlags, ChannelVoltageData, ChannelCurrentData, ReferenceVoltageData, ReferenceCurrentDat, Header);
 %   Uses export mode 1 to export all of the data (assuming N is identical for
 %   all export variables) from all of the export variables to the file
-%   test.ncs, overwriting any data that may be in that file.
+%   test.nsd, overwriting any data that may be in that file.
 %
 

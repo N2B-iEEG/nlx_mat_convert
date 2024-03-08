@@ -1,9 +1,9 @@
-% MAT2NLXTS   Exports data from Matlab into a Neuralynx NTS file.
+% MAT2NLXTS   Exports data from MATLAB into a Neuralynx NTS file.
 %
 %   Mat2NlxTS(Filename, AppendToFileFlag, ExportMode, ExportModeVector,
 %             FieldSelectionFlags, TimeStamps, Header);
 %
-%   Version 6.0.0 
+%   Version 6.1.0
 %
 %	Requires MATLAB R2012b (8.0) or newer
 %
@@ -103,7 +103,7 @@
 %                        in the timestamps export variable,the timestamp will
 %                        be ignored.
 %                        EXAMPLE: [10125 45032 75000] exports items that
-%                        that correspond to the items in the timestamps export
+%                        correspond to the items in the timestamps export
 %                        variable at timestamp 10125, 45032 and 75000. (i.e.
 %                        if 10125 corresponds to item 10 in the timestamps
 %                        export variable, item 10 will be exported for all
@@ -120,7 +120,7 @@
 %   Header: A Mx1 string vector of all the text from the Neuralynx file header, where
 %           M is the number of lines of text in the header.
 %
-%   EXAMPLE: Mat2NlxTS('test.nts', 0, 1, [],[1], Timestamps, Header);
+%   EXAMPLE: Mat2NlxTS('test.nts', 0, 1, [],[1 1], Timestamps, Header);
 %   Uses export mode 1 to export all of the data (assuming N is identical for
 %   all export variables) from all of the export variables to the file
 %   test.nts, overwriting any data that may be in that file.

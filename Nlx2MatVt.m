@@ -1,10 +1,10 @@
-% NLX2MATVT Imports data from Neuralynx NVT files to Matlab variables.
+% NLX2MATVT Imports data from Neuralynx NVT files to MATLAB variables.
 %
 %   [TimeStamps, ExtractedX, ExtractedY, ExtractedAngle, Targets, Points] =
 %                      Nlx2MatVT(  Filename, FieldSelection, ExtractHeader,
 %                                 ExtractMode, ModeArray );
 %
-%   Version 6.0.0 
+%   Version 6.1.0
 %
 %	Requires MATLAB R2012b (8.0) or newer
 %

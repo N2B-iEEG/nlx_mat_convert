@@ -1,8 +1,8 @@
-% NLX2MATCSC Imports data from Neuralynx NCS files to MATLAB variables.
+% NLX2MATNSD Imports data from Neuralynx NSD files to MATLAB variables.
 %
-%   [Timestamps, ChannelNumbers, SampleFrequencies, NumberOfValidSamples,
-%   Samples, Header] = Nlx2MatCSC( Filename, FieldSelectionFlags,
-%                      HeaderExtractionFlag, ExtractMode, ExtractionModeVector);
+%   [TimeStamps, SequenceIDs, ControlFlags, ChannelVoltageData, ChannelCurrentData, ReferenceVoltageData, ReferenceCurrentData] =
+%                      Nlx2MatNSD(  Filename, FieldSelection, ExtractHeader,
+%                                 ExtractMode, ModeArray );
 %
 %   Version 6.1.0
 %
@@ -11,18 +11,20 @@
 %
 %   INPUT ARGUMENTS:
 %   FileName: String containing either the complete ('C:\CheetahData\
-%             CSC1.ncs') or relative ('CSC1.ncs') path of the file you wish
+%             StimulationData.nsd') or relative ('StimulationData.nsd') path of the file you wish
 %             to import. 
 %   FieldSelectionFlags: Vector with each item being either a zero (excludes
 %                        data) or a one (includes data) that determines which
 %                        data will be returned for each record. The order of
 %                        the items in the vector correspond to the following:
 %                           FieldSelectionFlags(1): Timestamps
-%                           FieldSelectionFlags(2): Channel Numbers
-%                           FieldSelectionFlags(3): Sample Frequency
-%                           FieldSelectionFlags(4): Number of Valid Samples
-%                           FieldSelectionFlags(5): Samples
-%                        EXAMPLE: [1 0 0 0 1] imports timestamp and samples
+%                           FieldSelectionFlags(2): SequenceIDs
+%                           FieldSelectionFlags(3): ControlFlags
+%                           FieldSelectionFlags(4): ChannelVoltageData
+%                           FieldSelectionFlags(5): ChannelCurrentData
+%                           FieldSelectionFlags(6): ReferenceVoltageData
+%                           FieldSelectionFlags(7): ReferenceCurrentData
+%                        EXAMPLE: [1 1 0 0 0 1 0] imports timestamp, sequence ID and reference voltage data
 %                        data from each record and excludes all other data.
 %   HeaderExtractionFlag: Either a zero if you do not want to import the header
 %                         or a one if header import is desired..
@@ -101,28 +103,32 @@
 %   4. Output data will always be assigned in the order indicated in the
 %      FieldSelectionFlags. If data is not imported via a FieldSelectionFlags
 %      index being 0, simply omit the output variable from the command.
-%      EXAMPLE: FieldSelectionFlags = [1 0 0 0 1];
-%      [Timestamps,Samples] = Nlx2MatCSC('test.ncs',FieldSelectionFlags,0,1,[]);
+%      EXAMPLE: FieldSelectionFlags = [1 0 0 0 0 0 1];
+%      [Timestamps,ReferenceCurrentData] = Nlx2MatNSD('test.nsd',FieldSelectionFlags,0,6,[]);
 %
 %   OUTPUT VARIABLES:
 %   Timestamps: A 1xN integer vector of timestamps.
-%   ChannelNumbers: A 1xN integer vector of channel numbers.
-%   SampleFrequencies: A 1xN integer vector of sample frequencies.
-%   NumberOfValidSamples: A 1xN integer vector of the number of valid samples in the
-%                         corresponding item in the Sample output variable.
-%   Samples: A 512xN integer matrix of the data points. These values are in AD counts.
+%   SequenceIDs: A 1xN integer vector of the sequence ID of the record.
+%   Control flags: A 1xN integer vector of control flags associated with each record.
+%   Channel Voltage Data: A 64xN integer vector of the delivered voltage
+%            values for each record. This value is in microvolts.
+%   ChannelCurrentData: A 64xN integer matrix of the delivered current values for each record.
+%           These values are in microamps. 
+%   Reference Voltage Data: An 8xN integer matrix of the delivered voltage values for the references for each frame. These values
+%            are in microvolts.
+%   ReferenceCurrentData: An 8xN integer matrix of the delivered current values for each reference for each record.
+%           These values are in microamps.
 %   Header: A Mx1 string vector of all the text from the Neuralynx file header, where
 %           M is the number of lines of text in the header.
 %
 %
-%   EXAMPLE: [Timestamps, ChannelNumbers, SampleFrequencies,
-%             NumberOfValidSamples, Samples, Header] = Nlx2MatCSC('test.ncs',
-%                                                      [1 1 1 1 1], 1, 1, [] );
+%   EXAMPLE: [Timestamps, SequenceIDs, ControlFlags, ChannelVoltageData, ChannelCurrentData, ReferenceVoltageData, ReferenceCurrentData, Header] =
+%            Nlx2MatNSD('test.nsd', [1 1 1 1 1 1 1], 1, 1, [] );
 %   Uses extraction mode 1 to return all of the data from all of the records
-%   in the file test.ncs.
+%   in the file test.nsd.
 %
-%   EXAMPLE: [Timestamps, Samples, Header] = Nlx2MatCSC('test.ncs', [1 0 0 0 1],
-%                                            1, 2, [14 30]);
-%   Uses extraction mode 2 to return the Timestamps and Samples at between
+%   EXAMPLE: [Timestamps, SequenceIDs, ChannelVoltageData, Header] = Nlx2MatNSD('test.nsd',
+%            [1 1 0 1 0 0 0], 1, 2, [14 30]);
+%   Uses extraction mode 2 to return the Timestamps, SequenceIDs and Channel voltage data between
 %   record index 14 and 30 as well as the complete file header.
 %

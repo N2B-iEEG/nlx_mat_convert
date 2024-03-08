@@ -1,10 +1,10 @@
-% MAT2NLXNRD   Exports data from Matlab into a Neuralynx NRD file.
+% MAT2NLXNRD   Exports data from MATLAB into a Neuralynx NRD file.
 %
 %   Mat2NlxNRD(FileName, ChannelNumber, AppendToFileFlag, ExportMode,
 %              ExportModeVector, FieldSelectionFlags, Timestamps,
 %              Samples, Header);
 %
-%   Version 6.0.0 
+%   Version 6.1.0
 %
 %	Requires MATLAB R2012b (8.0) or newer
 %
@@ -28,7 +28,7 @@
 %   4. Export data will always be assigned in the order indicated in the
 %      FieldSelectionFlags. If data is not imported via a FieldSelectionFlags
 %      index being 0, simply omit the export variable from the command.
-%      EXAMPLE: FieldSelectionFlags = [1 0 1];
+%      EXAMPLE: FieldSelectionFlags = [1 0 1 1];
 %      Mat2NlxNRD('test.nrd',3,0,1,1, FieldSelectionFlags,Timestamps, Header);
 %
 %
@@ -52,6 +52,13 @@
 %                     the current file. This could result in the output file
 %                     not being in increasing temporal order. If the file does
 %                     not exist when appending, a new file will be created.
+%                     If this flag is a 2, the file already exists and contains
+%                     data, and sample data is being exported, the data record
+%                     written to the file will be padded out to ensure that the
+%                     record size remains consistent.  For example, if the data
+%                     file denotes that a record contains 100 AD channels and the
+%                     selected channel is 79, each record will consist of a data
+%                     buffer of 100 samples, all 0, except for index 79.
 %   ExportMode: A number indicating how export variables will be processed
 %               during export. The numbers and their effect are described below:
 %                  1 (Export All): Exports data from N items in each export
@@ -116,7 +123,7 @@
 %                        in the timestamps export variable,the timestamp will
 %                        be ignored.
 %                        EXAMPLE: [10125 45032 75000] exports items that
-%                        that correspond to the items in the timestamps export
+%                        correspond to the items in the timestamps export
 %                        variable at timestamp 10125, 45032 and 75000. (i.e.
 %                        if 10125 corresponds to item 10 in the timestamps
 %                        export variable, item 10 will be exported for all
@@ -127,17 +134,19 @@
 %                        the items in the vector correspond to the following:
 %                           FieldSelectionFlags(1): Timestamps
 %                           FieldSelectionFlags(2): Samples
-%                           FieldSelectionFlags(3): Header
-%                        EXAMPLE: [1 1 0] exports timestamp and samples
+%                           FieldSelectionFlags(3): Parallel Input Port Values
+%                           FieldSelectionFlags(4): Header
+%                        EXAMPLE: [1 1 0 0] exports timestamp and samples
 %                        data from each record and excludes all other data.
 %   Timestamps: A 1xN integer vector of timestamps. These timestamps are the full
 %               64 bit Cheetah timestamps.
 %   Samples: A 1xN integer vector of the data points. These values are in AD counts.
+%   Parallel Input Port Values: A 1xN unsigned integer vector the of Parallel Input Port values 
 %   Header: A Mx1 string vector of all the text from the Neuralynx file header, where
 %           M is the number of lines of text in the header.
 %
-%   EXAMPLE: Mat2NlxNRD('test.nrd', 3, 0, 1, 1, [1 1 1], Timestamps,
-%                      Samples, Header);
+%   EXAMPLE: Mat2NlxNRD('test.nrd', 3, 0, 1, 1, [1 1 1, 1], Timestamps,
+%                      Samples, Parallel Input Port Values, Header);
 %   Uses export mode 1 to export all of the data (assuming N is identical for
 %   all export variables) from all of the export variables to the file
 %   test.nrd at channel number 3, overwriting any data that may be in that file.

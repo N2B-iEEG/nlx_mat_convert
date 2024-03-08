@@ -1,10 +1,10 @@
-% MAT2NLXNDE   Exports data from Matlab into a Neuralynx NDE file.
+% MAT2NLXNDE   Exports data from MATLAB into a Neuralynx NDE file.
 %
 %   Mat2NlxNDE(FileName, AppendToFileFlag, ExportMode, ExportModeVector,
 %              FieldSelectionFlags, StartTimestamps, EndTimestamps,
 %              SamplesLost, DataTypes, ObjectNames, Header);
 %
-%   Version 6.0.0 
+%   Version 6.1.0
 %
 %	Requires MATLAB R2012b (8.0) or newer
 %
@@ -104,7 +104,7 @@
 %                        in the timestamps export variable,the timestamp will
 %                        be ignored.
 %                        EXAMPLE: [10125 45032 75000] exports items that
-%                        that correspond to the items in the timestamps export
+%                        correspond to the items in the timestamps export
 %                        variable at timestamp 10125, 45032 and 75000. (i.e.
 %                        if 10125 corresponds to item 10 in the timestamps
 %                        export variable, item 10 will be exported for all
