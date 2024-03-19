@@ -191,7 +191,7 @@ else
             samp_ts = 512 / ch_data_this.HeaderStruct.SamplingFrequency * 1e6;
 
             within_seg = (SampTable.TimeStamps >= seg_start_ts - 3 * samp_ts) & ...
-                (SampTable.TimeStamps <= seg_end_ts + 4 * samp_ts);
+                (SampTable.TimeStamps <= seg_end_ts + 3 * samp_ts);
             SampTableSeg = SampTable(within_seg,:);
 
             if SampTableSeg.TimeStamps(1) - seg_start_ts > 0
