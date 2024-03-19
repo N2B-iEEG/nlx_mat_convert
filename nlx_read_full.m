@@ -68,6 +68,7 @@ else
     error('nlx_read_all currently only supports reading .nev and .ncs files')
 end
 
+output.Header = replace(output.Header, 'µs', 'micro_sec');
 output.HeaderStruct = nlx_hdr_parse(output.Header);
 
 end

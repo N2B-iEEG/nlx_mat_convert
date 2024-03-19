@@ -40,11 +40,19 @@ else
         fprintf('Valid event file %s\n', nev.name)
     end
     Header = events_this.Header;
-    Header{6} = '-OriginalFileName MergedEventFile';
-    Header{7} = sprintf('-TimeCreated %s', ...
+
+    % Modify header
+    OriginalFileName_idx = startsWith(Header, '-OriginalFileName');
+    Header{OriginalFileName_idx} = '-OriginalFileName SegmentedEventFile';
+
+    TimeCreated_idx = startsWith(Header, '-TimeCreated');
+    Header{TimeCreated_idx} = sprintf('-TimeCreated %s', ...
         string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
-    Header{8} = sprintf('-TimeClosed %s', ...
+
+    TimeClosed_idx = startsWith(Header, '-TimeClosed');
+    Header{TimeClosed_idx} = sprintf('-TimeClosed %s', ...
         string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
+
     EventTable = sortrows(EventTable, 'TimeStamps', 'ascend');
 
     % Write merged events to `mer_nev`
@@ -118,11 +126,19 @@ else
             SampTable = [SampTable; ch_data_this.SampTable];
         end
         Header = events_this.Header;
-        Header{7} = '-OriginalFileName MergedRecordingFile';
-        Header{8} = sprintf('-TimeCreated %s', ...
+
+        % Modify header
+        OriginalFileName_idx = startsWith(Header, '-OriginalFileName');
+        Header{OriginalFileName_idx} = '-OriginalFileName SegmentedEventFile';
+
+        TimeCreated_idx = startsWith(Header, '-TimeCreated');
+        Header{TimeCreated_idx} = sprintf('-TimeCreated %s', ...
             string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
-        Header{9} = sprintf('-TimeClosed %s', ...
+
+        TimeClosed_idx = startsWith(Header, '-TimeClosed');
+        Header{TimeClosed_idx} = sprintf('-TimeClosed %s', ...
             string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
+
         SampTable = sortrows(SampTable, 'TimeStamps', 'ascend');
 
         % Write merged channel data

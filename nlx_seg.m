@@ -40,11 +40,19 @@ else
         fprintf('Valid event file %s\n', nev.name)
     end
     Header = events_this.Header;
-    Header{6} = '-OriginalFileName SegmentedEventFile';
-    Header{7} = sprintf('-TimeCreated %s', ...
+
+    % Modify header
+    OriginalFileName_idx = startsWith(Header, '-OriginalFileName');
+    Header{OriginalFileName_idx} = '-OriginalFileName SegmentedEventFile';
+
+    TimeCreated_idx = startsWith(Header, '-TimeCreated');
+    Header{TimeCreated_idx} = sprintf('-TimeCreated %s', ...
         string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
-    Header{8} = sprintf('-TimeClosed %s', ...
+
+    TimeClosed_idx = startsWith(Header, '-TimeClosed');
+    Header{TimeClosed_idx} = sprintf('-TimeClosed %s', ...
         string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
+
     EventTable = sortrows(EventTable, 'TimeStamps', 'ascend');
 
     % Segment events run by run
@@ -142,15 +150,21 @@ else
         SampTable = table();
         ch_files = table2cell(ncs_table(strcmp(ncs_table.Var2,ch), 1));
         for ch_file = ch_files'
-            ch_file = ch_file{1};
-            ch_data_this = nlx_read_full(ch_file);
+            ch_data_this = nlx_read_full(ch_file{1});
             SampTable = [SampTable; ch_data_this.SampTable];
         end
         Header = ch_data_this.Header;
-        Header{7} = '-OriginalFileName SegmentedRecordingFile';
-        Header{8} = sprintf('-TimeCreated %s', ...
+
+        % Modify header
+        OriginalFileName_idx = startsWith(Header, '-OriginalFileName');
+        Header{OriginalFileName_idx} = '-OriginalFileName SegmentedEventFile';
+
+        TimeCreated_idx = startsWith(Header, '-TimeCreated');
+        Header{TimeCreated_idx} = sprintf('-TimeCreated %s', ...
             string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
-        Header{9} = sprintf('-TimeClosed %s', ...
+
+        TimeClosed_idx = startsWith(Header, '-TimeClosed');
+        Header{TimeClosed_idx} = sprintf('-TimeClosed %s', ...
             string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
 
         SampTable = sortrows(SampTable, 'TimeStamps', 'ascend');
