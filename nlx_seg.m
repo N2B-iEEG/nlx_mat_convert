@@ -8,6 +8,18 @@ if ~ispc && ~isunix
     error('Nlx2Mat is only available on Windows/Linux/MacOS\n')
 end
 
+%% Check if segmentation has been done before
+for i_run = 1:size(run_table, 1)
+    seg_dir = fullfile(nlx_dir, run_table.run_name(i_run));
+    status_file = fullfile(seg_dir, 'segment.log');
+    segment_run(i_run) = exist(status_file, 'file');
+end
+
+if ~any(segment_run == 0)
+    fprintf('All runs have been segmented. No operation available.\n')
+    return
+end
+
 %% Find all events and segment
 nev_files = dir(fullfile(nlx_dir, '*.nev'));
 
@@ -40,6 +52,11 @@ else
 
         run_name = run_table.run_name(i_run);
         seg_dir = fullfile(nlx_dir, run_name);
+
+        if segment_run(i_run)
+            fprintf('Segmented file already exist in %s. Skipping.\n', seg_dir)
+            continue
+        end
 
         seg_start_ts = run_table.start_ts(i_run);
         seg_end_ts   = run_table.end_ts(i_run);
@@ -143,6 +160,11 @@ else
             run_name = run_table.run_name(i_run);
             seg_dir = fullfile(nlx_dir, run_name);
 
+            if segment_run(i_run)
+                fprintf('Segmented file already exist in %s. Skipping.\n', seg_dir)
+                continue
+            end
+
             seg_start_ts = run_table.start_ts(i_run);
             seg_end_ts   = run_table.end_ts(i_run);
 
@@ -195,6 +217,16 @@ else
             fprintf('Segmented .ncs exported to %s\n', seg_ch_ncs)
         end
     end
+end
+
+%% Mark segmentation as complete
+for i_run = 1:size(run_table, 1)
+
+    seg_dir = fullfile(nlx_dir, run_table.run_name(i_run));
+    status_file = fullfile(seg_dir, 'segment.log');
+    fid = fopen(status_file, 'w');
+    fclose(fid);
+
 end
 
 end

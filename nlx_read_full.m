@@ -6,6 +6,8 @@ if ~ispc && ~isunix
     error('Nlx2Mat is only available on Windows/Linux/MacOS\n')
 end
 
+FileName = char(FileName);
+
 output = struct();
 
 % Determine file extension
