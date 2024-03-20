@@ -1,10 +1,10 @@
-% MAT2NLXSPIKE   Exports data from MATLAB into a Neuralynx NSE, NST or NTT file.
+% MAT2NLXSPIKE   Exports data from Matlab into a Neuralynx NSE, NST or NTT file.
 %
 %   Mat2NlxSpike( Filename, AppendToFileFlag, ExportMode, ExportModeVector,
 %                 FieldSelectionFlags, Timestamps, ScNumbers, CellNumbers,
 %                 Features, Samples, Header);
 %
-%   Version 6.1.0
+%   Version 6.0.0 
 %
 %	Requires MATLAB R2012b (8.0) or newer
 %
@@ -104,7 +104,7 @@
 %                        in the timestamps export variable,the timestamp will
 %                        be ignored.
 %                        EXAMPLE: [10125 45032 75000] exports items that
-%                        correspond to the items in the timestamps export
+%                        that correspond to the items in the timestamps export
 %                        variable at timestamp 10125, 45032 and 75000. (i.e.
 %                        if 10125 corresponds to item 10 in the timestamps
 %                        export variable, item 10 will be exported for all
@@ -135,7 +135,7 @@
 %   Header: A Mx1 string vector of all the text from the Neuralynx file header, where
 %           M is the number of lines of text in the header.
 %
-%   EXAMPLE:  Mat2NlxSpike('test.nst', 0, 1, [], [1 1 1 1 1 1], Timestamps,
+%   EXAMPLE:  Mat2NlxSpike('test.nst', 0, 1, [], [1 1 1 1 1], Timestamps,
 %             ScNumbers, CellNumbers, Features, Samples, Header);
 %   Uses export mode 1 to export all of the data (assuming N is identical for
 %   all export variables) from all of the export variables to the file

@@ -1,10 +1,10 @@
-% NLX2MATNDE Imports data from Neuralynx NDE files to MATLAB variables.
+% NLX2MATNDE Imports data from Neuralynx NDE files to Matlab variables.
 %
 %   [StartTimeStamps, EndTimeStamps, SamplesLost, DataTypes, ObjectNames, Header] =
 %                      Nlx2MatNDE( Filename, FieldSelection, ExtractHeader,
 %                                 ExtractMode, ModeArray );
 %
-%   Version 6.1.0
+%   Version 6.0.0 
 %
 %	Requires MATLAB R2012b (8.0) or newer
 %

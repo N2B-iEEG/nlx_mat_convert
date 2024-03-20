@@ -1,9 +1,9 @@
-% NLX2MATTS Imports data from Neuralynx NTS files to MATLAB variables.
+% NLX2MATTS Imports data from Neuralynx NTS files to Matlab variables.
 %
 %   [TimeStamps, Header] = Nlx2MatTS( Filename, FieldSelection, ExtractHeader,
 %                                 ExtractMode, ModeArray );
 %
-%   Version 6.1.0
+%   Version 6.0.0 
 %
 %	Requires MATLAB R2012b (8.0) or newer
 %

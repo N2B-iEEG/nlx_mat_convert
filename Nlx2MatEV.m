@@ -1,10 +1,10 @@
-% NLX2MATEV Imports data from Neuralynx NEV files to MATLAB variables.
+% NLX2MATEV Imports data from Neuralynx NEV files to Matlab variables.
 %
 %   [TimeStamps, EventIDs, TTLs, Extras, EventStrings, Header] =
 %                      Nlx2MatEV( Filename, FieldSelection, ExtractHeader,
 %                                 ExtractMode, ModeArray );
 %
-%   Version 6.1.0
+%   Version 6.0.0 
 %
 %	Requires MATLAB R2012b (8.0) or newer
 %

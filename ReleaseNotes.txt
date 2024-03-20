@@ -5,22 +5,6 @@
 *********************************************
 
 ****************
-* v6.1.0
-****************
-Added Features:
--Nlx2MatNSD and Mat2NlxNSD MEX files added for NSD file processing.
--Nlx2MatNRD and Mat2NlxNRD support Parallel Input Port values.  Note that is is a breaking change, in that the header field selection for export is now at offset 4
--New append flag option added to Mat2NlxNRD to allow for records to be written
- to existing files with the same sample count as existing records. Refer to
- Mat2NlxNRD.m for further information.
-
-General Changes:
--Fix output record creation in NEV files so that they can be read properly.
--Fix output file creation in NRD files so that the header is properly updated.
--Fix output file creation for NTT files to allow the header to be properly updated.
--Fix some typos in the help files and error messages.
-
-****************
 * v6.0.0
 ****************
 Added Features:

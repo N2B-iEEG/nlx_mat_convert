@@ -1,10 +1,10 @@
-% MAT2NLXCSC   Exports data from MATLAB into a Neuralynx NCS file.
+% MAT2NLXCSC   Exports data from Matlab into a Neuralynx NCS file.
 %
 %   Mat2NlxCSC(FileName, AppendToFileFlag, ExportMode, ExportModeVector,
 %              FieldSelectionFlags, Timestamps, ChannelNumbers,
 %              SampleFrequencies, NumberOfValidSamples, Samples, Header);
 %
-%   Version 6.1.0
+%   Version 6.0.0 
 %
 %	Requires MATLAB R2012b (8.0) or newer
 %
@@ -104,7 +104,7 @@
 %                        in the timestamps export variable,the timestamp will
 %                        be ignored.
 %                        EXAMPLE: [10125 45032 75000] exports items that
-%                        correspond to the items in the timestamps export
+%                        that correspond to the items in the timestamps export
 %                        variable at timestamp 10125, 45032 and 75000. (i.e.
 %                        if 10125 corresponds to item 10 in the timestamps
 %                        export variable, item 10 will be exported for all

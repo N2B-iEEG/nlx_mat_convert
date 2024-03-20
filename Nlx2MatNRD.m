@@ -1,10 +1,10 @@
-% NLX2MATNRD Imports data from Neuralynx NRD files to MATLAB variables.
+% NLX2MATNRD Imports data from Neuralynx NRD files to Matlab variables.
 %
 %   [Timestamps, Samples, Header] = Nlx2MatNRD( Filename, ChannelNumber,
 %                                  FieldSelectionFlags, HeaderExtractionFlag,
 %                                  ExtractMode, ExtractionModeVector);
 %
-%   Version 6.1.0
+%   Version 6.0.0 
 %
 %	Requires MATLAB R2012b (8.0) or newer
 %
@@ -22,8 +22,7 @@
 %                        the items in the vector correspond to the following:
 %                           FieldSelectionFlags(1): Timestamps
 %                           FieldSelectionFlags(2): Samples
-%                           FieldSelectionFlags(3): Parallel Input Port Values
-%                        EXAMPLE: [1 0 0] imports timestamp data from each record
+%                        EXAMPLE: [1 0] imports timestamp data from each record
 %                        and excludes all other data.
 %   HeaderExtractionFlag: Either a zero if you do not want to import the header
 %                         or a one if header import is desired..
@@ -102,24 +101,23 @@
 %   4. Output data will always be assigned in the order indicated in the
 %      FieldSelectionFlags. If data is not imported via a FieldSelectionFlags
 %      index being 0, simply omit the output variable from the command.
-%      EXAMPLE: FieldSelectionFlags = [1 0 0];
+%      EXAMPLE: FieldSelectionFlags = [1 0];
 %      [Timestamps] = Nlx2MatNRD('test.nrd', 3, FieldSelectionFlags,0,1,[]);
 %
 %   OUTPUT VARIABLES:
 %   Timestamps: A 1xN integer vector of timestamps. These timestamps are the full
 %               64 bit Cheetah timestamps.
 %   Samples: A 1xN integer vector of the data points. These values are in AD counts.
-%   Parallel Input Port Values: A 1xN unsigned integer vector the of Parallel Input Port values.
 %   Header: A Mx1 string vector of all the text from the Neuralynx file header, where
 %           M is the number of lines of text in the header.
 %
 %
-%   EXAMPLE: [Timestamps, Samples, ParallelInputPortValues, Header] = Nlx2MatNRD('test.nrd', 3,
-%                                            [1 1 1], 1, 1, [] );
+%   EXAMPLE: [Timestamps, Samples, Header] = Nlx2MatNRD('test.nrd', 3,
+%                                            [1 1], 1, 1, [] );
 %   Uses extraction mode 1 to return all of the data from all of the records of
 %   AD channel 3 in the file test.nrd.
 %
-%   EXAMPLE: [Timestamps, Header] = Nlx2MatNRD('test.nrd', 3,[1 0 0],1, 2, [14 30]);
+%   EXAMPLE: [Timestamps, Header] = Nlx2MatNRD('test.nrd', 3,[1 0],1, 2, [14 30]);
 %   Uses extraction mode 2 to return the Timestamps between record index 14 and
 %   30 of subchannel 3 as well as the complete file header.
 %
