@@ -9,7 +9,8 @@ if ~ispc && ~isunix
 end
 
 %% Check if segmentation has been done before
-for i_run = 1:size(run_table, 1)
+n_run = length(sub.run);
+for i_run = 1:n_run
     seg_dir = fullfile(nlx_dir, run_table.run_name(i_run));
     status_file = fullfile(seg_dir, 'segment.log');
     segment_run(i_run) = exist(status_file, 'file');
@@ -56,7 +57,7 @@ else
     EventTable = sortrows(EventTable, 'TimeStamps', 'ascend');
 
     % Segment events run by run
-    for i_run = 1:size(run_table, 1)
+    for i_run = 1:n_run
 
         run_name = run_table.run_name(i_run);
         seg_dir = fullfile(nlx_dir, run_name);
@@ -169,7 +170,7 @@ else
 
         SampTable = sortrows(SampTable, 'TimeStamps', 'ascend');
 
-        for i_run = 1:size(run_table, 1)
+        for i_run = 1:n_run
 
             run_name = run_table.run_name(i_run);
             seg_dir = fullfile(nlx_dir, run_name);
@@ -234,7 +235,7 @@ else
 end
 
 %% Mark segmentation as complete
-for i_run = 1:size(run_table, 1)
+for i_run = 1:n_run
 
     seg_dir = fullfile(nlx_dir, run_table.run_name(i_run));
     status_file = fullfile(seg_dir, 'segment.log');
