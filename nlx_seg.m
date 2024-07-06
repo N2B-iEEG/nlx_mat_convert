@@ -42,18 +42,6 @@ else
     end
     Header = events_this.Header;
 
-    % Modify header
-    OriginalFileName_idx = startsWith(Header, '-OriginalFileName');
-    Header{OriginalFileName_idx} = '-OriginalFileName SegmentedEventFile';
-
-    TimeCreated_idx = startsWith(Header, '-TimeCreated');
-    Header{TimeCreated_idx} = sprintf('-TimeCreated %s', ...
-        string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
-
-    TimeClosed_idx = startsWith(Header, '-TimeClosed');
-    Header{TimeClosed_idx} = sprintf('-TimeClosed %s', ...
-        string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
-
     EventTable = sortrows(EventTable, 'TimeStamps', 'ascend');
 
     % Segment events run by run
@@ -70,19 +58,50 @@ else
         seg_start_ts = run_table.start_ts(i_run);
         seg_end_ts   = run_table.end_ts(i_run);
 
+        % Get events in the run
+        within_seg = ...
+            (EventTable.TimeStamps >= seg_start_ts) & ...
+            (EventTable.TimeStamps <= seg_end_ts);
+        EventTableSeg = EventTable(within_seg,:);
+
         % Create seg_dir if not already
         if ~exist(seg_dir, 'dir')
             mkdir(seg_dir)
         end
 
+        % New .nev file
         seg_nev = fullfile(seg_dir, 'Events.nev');
         if exist(seg_nev, 'file')
             delete(seg_nev)
         end
 
-        within_seg = (EventTable.TimeStamps >= seg_start_ts) & ...
-            (EventTable.TimeStamps <= seg_end_ts);
-        EventTableSeg = EventTable(within_seg,:);
+        % Modify header
+        OriginalFileName_idx = startsWith(Header, '-OriginalFileName');
+        if any(OriginalFileName_idx)
+            Header{OriginalFileName_idx} = sprintf( ...
+                '-OriginalFileName %s', seg_nev);
+        else
+            Header{end+1} = sprintf( ...
+                '-OriginalFileName %s', seg_nev);
+        end
+
+        TimeCreated_idx = startsWith(Header, '-TimeCreated');
+        if any(TimeCreated_idx)
+            Header{TimeCreated_idx} = sprintf('-TimeCreated %s', ...
+                string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
+        else
+            Header{end+1} = sprintf('-TimeCreated %s', ...
+                string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
+        end
+
+        TimeClosed_idx = startsWith(Header, '-TimeClosed');
+        if any(TimeClosed_idx)
+            Header{TimeClosed_idx} = sprintf('-TimeClosed %s', ...
+                string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
+        else
+            Header{end+1} = sprintf('-TimeClosed %s', ...
+                string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
+        end
 
         % Write segmented events to seg_dir
         if isunix
@@ -155,19 +174,6 @@ else
             SampTable = [SampTable; ch_data_this.SampTable];
         end
         Header = ch_data_this.Header;
-
-        % Modify header
-        OriginalFileName_idx = startsWith(Header, '-OriginalFileName');
-        Header{OriginalFileName_idx} = '-OriginalFileName SegmentedEventFile';
-
-        TimeCreated_idx = startsWith(Header, '-TimeCreated');
-        Header{TimeCreated_idx} = sprintf('-TimeCreated %s', ...
-            string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
-
-        TimeClosed_idx = startsWith(Header, '-TimeClosed');
-        Header{TimeClosed_idx} = sprintf('-TimeClosed %s', ...
-            string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
-
         SampTable = sortrows(SampTable, 'TimeStamps', 'ascend');
 
         for i_run = 1:n_run
@@ -183,6 +189,7 @@ else
             seg_start_ts = run_table.start_ts(i_run);
             seg_end_ts   = run_table.end_ts(i_run);
 
+            % New .ncs file
             seg_ch_ncs = fullfile(seg_dir, strcat(ch, '.ncs'));
             if exist(seg_ch_ncs, 'file')
                 delete(seg_ch_ncs)
@@ -191,7 +198,9 @@ else
             % Time difference between each contineous data sample (in microsec)
             samp_ts = 512 / ch_data_this.HeaderStruct.SamplingFrequency * 1e6;
 
-            within_seg = (SampTable.TimeStamps >= seg_start_ts - 3 * samp_ts) & ...
+            % Get data 3 samples before and after
+            within_seg = ...
+                (SampTable.TimeStamps >= seg_start_ts - 3 * samp_ts) & ...
                 (SampTable.TimeStamps <= seg_end_ts + 3 * samp_ts);
             SampTableSeg = SampTable(within_seg,:);
 
@@ -206,6 +215,34 @@ else
             ts_diff = diff(SampTableSeg.TimeStamps);
             if max(ts_diff) > 5 * 512 / ch_data_this.HeaderStruct.SamplingFrequency * 1e6
                 warning('May not be a contineous recording')
+            end
+
+            % Modify header
+            OriginalFileName_idx = startsWith(Header, '-OriginalFileName');
+            if any(OriginalFileName_idx)
+                Header{OriginalFileName_idx} = sprintf( ...
+                    '-OriginalFileName %s', seg_nev);
+            else
+                Header{end+1} = sprintf( ...
+                    '-OriginalFileName %s', seg_nev);
+            end
+
+            TimeCreated_idx = startsWith(Header, '-TimeCreated');
+            if any(TimeCreated_idx)
+                Header{TimeCreated_idx} = sprintf('-TimeCreated %s', ...
+                    string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
+            else
+                Header{end+1} = sprintf('-TimeCreated %s', ...
+                    string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
+            end
+
+            TimeClosed_idx = startsWith(Header, '-TimeClosed');
+            if any(TimeClosed_idx)
+                Header{TimeClosed_idx} = sprintf('-TimeClosed %s', ...
+                    string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
+            else
+                Header{end+1} = sprintf('-TimeClosed %s', ...
+                    string(datetime('now'), 'yyyy/MM/dd hh:mm:ss'));
             end
 
             % Write segmented channel data
