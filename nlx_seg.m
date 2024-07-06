@@ -9,7 +9,7 @@ if ~ispc && ~isunix
 end
 
 %% Check if segmentation has been done before
-n_run = length(sub.run);
+n_run = size(run_table, 1);
 for i_run = 1:n_run
     seg_dir = fullfile(nlx_dir, run_table.run_name(i_run));
     status_file = fullfile(seg_dir, 'segment.log');
